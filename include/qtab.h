@@ -5,11 +5,17 @@
 #include <QPushButton>
 #include <QWidget>
 #include <QGridLayout>
-#include <QMouseEvent>
 #include <QMenu>
 #include <QAction>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QMenuBar>
 #include <QInputDialog>
+#include <QStringList>
+#include <QByteArray>
+#include "exception.h"
+
+using namespace exception;
 
 class QTab : public QTabWidget
 {
@@ -20,14 +26,24 @@ public:
 public:
     QMenuBar* setUpMenu()const noexcept;
 
+    QWidget *widgetLoggerSetUP() noexcept;
+
 public slots:
     void removeTab() const noexcept;
 
-public slots:
-    void addTab();
+    void checkLogger() noexcept;
+
+    void addTab() noexcept;
+
+    void clearLogsFile();
+
+    void showLoggers();
 
 private:
      QTabWidget *tabWidget;
+     QWidget *logger_wgt;
+     QTableWidget *table;
+     Exception err;
 };
 
 #endif // QTAB_H

@@ -1,42 +1,49 @@
 #include "form.h"
 #include "password.h"
 #include "ui_form.h"
+#include "database.h"
 
-FormSearch::FormSearch(QWidget *parent) : QWidget(parent) {
+FormSearch::FormSearch(QWidget *parent) :
+    QWidget(parent),validator() {
+
   QPushButton *btn_search = new QPushButton(tr("search"));
   QLabel *id_search = new QLabel(tr("Search user by id"));
   id_search->font();
 
-  line_edit = new QLineEdit();
+  id_edit = new QLineEdit();
+  validator.isID(id_edit->text());
+
   txt_edit = new QTextEdit();
   txt_edit->setReadOnly(true);
 
   QGridLayout *grid_layout = new QGridLayout;
   grid_layout->addWidget(txt_edit, 0, 0);
-  grid_layout->addWidget(line_edit, 2, 0);
+  grid_layout->addWidget(id_edit, 2, 0);
   grid_layout->addWidget(id_search, 1, 0);
   grid_layout->addWidget(btn_search, 2, 1);
 
-  QObject::connect(line_edit, SIGNAL(returnPressed()), this,
-                   SLOT(add_text_to_text_edit()));
-  QObject::connect(btn_search, SIGNAL(clicked()), this,
+  QObject::connect(id_edit, SIGNAL(returnPressed()), this,
                    SLOT(add_text_to_text_edit()));
 
+  Database *db  = new Database;
+  QObject::connect(btn_search, &QPushButton::clicked, db, [=]() {
+      db->getData(id_edit->text());
+  });
   setLayout(grid_layout);
+
 }
 
 FormSearch::~FormSearch() {
-  delete line_edit;
+  delete id_edit;
   delete txt_edit;
 }
 
 void FormSearch::add_text_to_text_edit() {
-  txt_edit->setText(line_edit->text());
-  line_edit->clear();
+  txt_edit->setText(id_edit->text());
+  id_edit->clear();
 }
 
 FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
-
   QPushButton *add_btn = new QPushButton(tr("Add"));
   QPushButton *hash_btn = new QPushButton(tr("Hash Password"));
   QPushButton *unhash_btn = new QPushButton(tr("UnHash Password"));
@@ -46,11 +53,14 @@ FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
   QLabel *label_id = new QLabel(tr("ID"));
 
   line_password = new QLineEdit;
+  line_password->setEchoMode(QLineEdit::Password);
+  validator.isPassword(line_password->text());
+
   line_name = new QLineEdit;
   line_id = new QLineEdit;
+  validator.isID(line_id->text());
 
-  Password *pass = new Password;
-
+  Encrypter  *ecncrypt = new Encrypter;
   QGridLayout *grid_layout = new QGridLayout;
   grid_layout->addWidget(label_id, 0, 0);
   grid_layout->addWidget(line_id, 1, 0);
@@ -65,13 +75,28 @@ FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
   QGroupBox *group_box = new QGroupBox(this);
   group_box->setLayout(grid_layout);
 
-  QObject::connect(hash_btn, &QPushButton::clicked, pass, [=]() {
-    QString password = line_password->text();
-    pass->HashPassword(password);
+  Database *db = new Database;
+
+  QObject::connect(add_btn, &QPushButton::clicked, db, [=]() {
+    db->insertData(line_id->text(), line_name->text(), line_password->text());
+    line_id->clear();
+    line_name->clear();
+    line_password->clear();
   });
 
-  QObject::connect(unhash_btn, SIGNAL(clicked(true)), pass,
-                   SLOT(UnHashPassword()));
+  QObject::connect(hash_btn, &QPushButton::clicked, ecncrypt , [=]() {
+    auto key = QInputDialog::getText(this,tr("Tab name "),
+                                       tr("Enter new tab name: "),QLineEdit::Normal);
+    auto data = db->getData(line_id->text());
+   // ecncrypt ->Encrypt(data);
+    line_id->clear();
+  });
+
+  QObject::connect(unhash_btn, &QPushButton::clicked, db, [=]() {
+      auto data = db->getData(line_id->text());
+    //  ecncrypt ->Decrypt(data);
+      line_id->clear();
+  });
 }
 
 FormPassword::~FormPassword() {

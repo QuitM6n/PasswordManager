@@ -9,8 +9,10 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QInputDialog>
+#include "validator.h"
+#include "database.h"
 
-// user search tab
 class FormSearch : public QWidget
 {
     Q_OBJECT
@@ -23,11 +25,11 @@ public slots:
     void add_text_to_text_edit();
 
 private:
-     QLineEdit *line_edit;
+     QLineEdit *id_edit;
      QTextEdit *txt_edit;
+     Validator validator;
 };
 
-// tab for adding a password
 class FormPassword : public QWidget {
     Q_OBJECT
 
@@ -42,6 +44,7 @@ private:
     QLineEdit *line_password;
     QLineEdit *line_name;
     QLineEdit * line_id;
+    Validator validator;
 };
 
 

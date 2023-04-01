@@ -4,15 +4,18 @@
 #include <QObject>
 #include <QWidget>
 
-class Password : public QObject
+class Encrypter : public QObject
 {
    Q_OBJECT
 public:
-   explicit Password(QWidget *parent = nullptr);
+   explicit Encrypter(QWidget *parent = nullptr);
 
 public slots:
-    void HashPassword(const QString &pass);
-    void UnHashPassword(const QString &pass);
+    QString Encrypt(const QString &data,const QString &key);
+
+    QString Decrypt(const QString &data,const QString &key);
+private:
+
 };
 
 

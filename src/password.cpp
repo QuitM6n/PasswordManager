@@ -1,20 +1,12 @@
 #include "password.h"
 
 
+Encrypter ::Encrypter(QWidget *parent) : QObject(parent) {}
 
-Password::Password(QWidget *parent):
-    QObject(parent)
-{
-
-}
-
-void Password::HashPassword(const QString &pass)
-{
-    qDebug()<<pass;
+QString Encrypter ::Encrypt(const QString &data, const QString &key) {
 
 }
 
-void Password::UnHashPassword(const QString &pass)
-{
+QString Encrypter::Decrypt(const QString &data, const QString &key) {
 
 }
