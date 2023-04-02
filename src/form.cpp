@@ -2,11 +2,12 @@
 #include "password.h"
 #include "ui_form.h"
 #include "database.h"
+#include <iostream>
 
 FormSearch::FormSearch(QWidget *parent) :
     QWidget(parent),validator() {
 
-  QPushButton *btn_search = new QPushButton(tr("search"));
+  QPushButton *btn_search = new QPushButton(tr("Search"));
   QLabel *id_search = new QLabel(tr("Search user by id"));
   id_search->font();
 
@@ -25,12 +26,13 @@ FormSearch::FormSearch(QWidget *parent) :
   QObject::connect(id_edit, SIGNAL(returnPressed()), this,
                    SLOT(add_text_to_text_edit()));
 
-  Database *db  = new Database;
+  Database *db = new Database;
   QObject::connect(btn_search, &QPushButton::clicked, db, [=]() {
-      db->getData(id_edit->text());
+    const QString data = db->getData(id_edit->text());
+    txt_edit->append(data);
+    id_edit->clear();
   });
   setLayout(grid_layout);
-
 }
 
 FormSearch::~FormSearch() {
@@ -84,18 +86,25 @@ FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
     line_password->clear();
   });
 
-  QObject::connect(hash_btn, &QPushButton::clicked, ecncrypt , [=]() {
-    auto key = QInputDialog::getText(this,tr("Tab name "),
-                                       tr("Enter new tab name: "),QLineEdit::Normal);
-    auto data = db->getData(line_id->text());
-   // ecncrypt ->Encrypt(data);
+  QObject::connect(hash_btn, &QPushButton::clicked, ecncrypt, [=]() {
+    const QString key = QInputDialog::getText(this, tr("Tab name "),
+                                              tr("Enter key for enrcypt : "),
+                                              QLineEdit::Normal);
+    const QString data = db->getData(line_id->text());
+    ecncrypt->Encrypt(line_id->text(),data.toStdString(), key.toStdString());
     line_id->clear();
   });
 
   QObject::connect(unhash_btn, &QPushButton::clicked, db, [=]() {
-      auto data = db->getData(line_id->text());
-    //  ecncrypt ->Decrypt(data);
-      line_id->clear();
+    const QString key =
+        QInputDialog::getText(this, tr("Tab name "),
+                              tr("Enter key for decrypt: "), QLineEdit::Normal);
+    EncryptStorage encrypt_db;
+    QString data = encrypt_db.getEncryptData(line_id->text());
+    std::string str = qPrintable(data);
+    const QString decrypt_data =  ecncrypt->Decrypt(line_id->text(),str, key.toStdString());
+    qDebug()<<decrypt_data;
+    line_id->clear();
   });
 }
 

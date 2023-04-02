@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QTab *tab = new QTab(this);
     tab->resize(550,430);
-   // setCentralWidget(tab);
+    setCentralWidget(tab);
 }
 
 MainWindow::~MainWindow()

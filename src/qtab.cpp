@@ -120,5 +120,7 @@ void QTab::showLoggers() {
       table->setItem(0, 0, item_code);
    }
 
+
+   // TODO
    file.close();
 }

@@ -14,29 +14,31 @@ class Database : public QWidget
     Q_OBJECT
 public:
    explicit Database(QWidget * parent = nullptr);
+
    ~Database() = default;
+
 
 public:
     auto insertData(const QString &id_data,const QString &username,const QString& pass)  -> Code ;
 
     auto getData(const QString &id_data) -> QString ;
 
-    auto updateData(const QString &data,const QString &id_data)-> Code ;
-
     auto deleteData(const QString&id_data) -> Code ;
 
-private:
+protected:
     Exception err;
     QSqlDatabase db;
 };
 
+class EncryptStorage : protected Database {
+public:
+   auto insertEncryptData(const QString &id,const QString &data) -> Code;
 
-//class HashingDatabase  : public Database {
+   auto updateEncryptData(const QString &data,const QString& id) -> Code;
 
-//public:
+   auto getEncryptData(const QString& id) -> QString;
 
+};
 
-//private:
-//};
 
 #endif // DATABASE_H

@@ -65,14 +65,75 @@ auto Database::getData(const QString &id_data) -> QString {
   return data;
 }
 
-auto Database::updateData(const QString &data, const QString &id_data) -> Code {
+auto Database::deleteData(const QString &id_data) -> Code {
   QSqlQuery query(db);
+  const QString deleteSql = "DELETE FROM ManagePassword WHERE id = ?";
+
+  if (query.prepare(deleteSql)) {
+    query.addBindValue(id_data);
+    query.exec();
+  } else {
+    err.error("Failed to delete into db", int(Code::BAD_REQUEST));
+  }
 
   return Code::SUCCESS;
 }
 
-auto Database::deleteData(const QString &id_data) -> Code {
-    QSqlQuery query(db);
+auto EncryptStorage::insertEncryptData(const QString &id, const QString &data)
+    -> Code {
+  if (id.isEmpty()) {
+    err.error("Id id wrong", int(Code::WRONG_ID));
+  }
 
-   return Code::SUCCESS;
+  QSqlQuery query(db);
+  const QString insertSql = "INSERT INTO EncryptData(id,data)"
+                            "VALUES(?,?);";
+
+  if (query.prepare(insertSql)) {
+    query.addBindValue(id);
+    query.addBindValue(data);
+    query.exec();
+  } else {
+    err.error("Failed to insert db", int(Code::BAD_REQUEST));
+  }
+
+  return Code::SUCCESS;
+}
+
+auto  EncryptStorage::updateEncryptData(const QString &data,const QString &id) -> Code
+{
+    if(data.isEmpty()){
+        err.error("Data is empty",int(Code::NOT_VALID));
+    }
+    QSqlQuery query(db);
+    const QString updateSql = "UPDATE EncryptData SET data =:data WHERE id =:id";
+
+    if(query.prepare(updateSql)){
+        query.bindValue(":data",data);
+        query.bindValue(":id",id);
+        query.exec();
+    }else{
+         err.error("Failed to update db", int(Code::BAD_REQUEST));
+    }
+
+    return Code::SUCCESS;
+}
+
+auto EncryptStorage::getEncryptData(const QString &id) -> QString {
+  QSqlQuery query(db);
+  const QString selectSql = "SELECT data FROM EncryptData WHERE id = ?";
+
+  if (query.prepare(selectSql)) {
+    query.addBindValue(id);
+    query.exec();
+  } else {
+    err.error("Failed to select db", int(Code::BAD_REQUEST));
+  }
+
+  QString data = "";
+  while(query.next()){
+    data = query.value(0).toString();
+  }
+
+  return data;
 }
