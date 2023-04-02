@@ -7,5 +7,5 @@
 
 ___
 
-# [Images (must-view)](https://github.com/Kl1ck9r/PasswordManager/tree/main/screenshots)
+# [Images (must-view)](https://github.com/QuitM6n/PasswordManager/tree/main/screenshots)
 
