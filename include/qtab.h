@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QMenu>
+#include <QIcon>
 #include <QAction>
 #include <QTableWidget>
 #include <QTableWidgetItem>

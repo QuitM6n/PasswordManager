@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QVBoxLayout>
 #include "qtab.h"
 
 QT_BEGIN_NAMESPACE

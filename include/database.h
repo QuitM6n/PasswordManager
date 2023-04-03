@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlError>
 #include "exception.h"
 
 using namespace exception;
@@ -19,11 +20,14 @@ public:
 
 
 public:
-    auto insertData(const QString &id_data,const QString &username,const QString& pass)  -> Code ;
+  auto insertData(const QString &id_data, const QString &username="",
+                  const QString &pass="") -> Code;
 
-    auto getData(const QString &id_data) -> QString ;
+  auto getData(const QString &id_data) -> QString;
 
-    auto deleteData(const QString&id_data) -> Code ;
+  auto deleteData(const QString &id_data) -> Code;
+
+  auto updateData(const QString &id_data, const QString &password) -> Code;
 
 protected:
     Exception err;

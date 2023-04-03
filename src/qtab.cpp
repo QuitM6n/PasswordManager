@@ -1,6 +1,6 @@
 #include "qtab.h"
 #include "form.h"
-#include <QIcon>
+
 
 QTab::QTab(QWidget *parent)
 : QTabWidget(parent)

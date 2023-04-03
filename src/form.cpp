@@ -4,9 +4,7 @@
 #include "database.h"
 #include <iostream>
 
-FormSearch::FormSearch(QWidget *parent) :
-    QWidget(parent),validator() {
-
+FormSearch::FormSearch(QWidget *parent) : QWidget(parent), validator() {
   QPushButton *btn_search = new QPushButton(tr("Search"));
   QLabel *id_search = new QLabel(tr("Search user by id"));
   id_search->font();
@@ -33,6 +31,11 @@ FormSearch::FormSearch(QWidget *parent) :
     id_edit->clear();
   });
   setLayout(grid_layout);
+
+  QPalette pal = QPalette();
+  pal.setColor(QPalette::Window,Qt::gray);
+  this->setAutoFillBackground(true);
+  this->setPalette(pal);
 }
 
 FormSearch::~FormSearch() {
@@ -47,8 +50,9 @@ void FormSearch::add_text_to_text_edit() {
 
 FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
   QPushButton *add_btn = new QPushButton(tr("Add"));
-  QPushButton *hash_btn = new QPushButton(tr("Hash Password"));
-  QPushButton *unhash_btn = new QPushButton(tr("UnHash Password"));
+  QPushButton *encrypt_btn = new QPushButton(tr("Encrypt to Password"));
+  QPushButton *decrypt_btn = new QPushButton(tr("Decrypt to Password"));
+  QPushButton *generate_password = new QPushButton(tr("Generate Password"));
 
   QLabel *label_name = new QLabel(tr("Username"));
   QLabel *label_password = new QLabel(tr("Password"));
@@ -62,7 +66,7 @@ FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
   line_id = new QLineEdit;
   validator.isID(line_id->text());
 
-  Encrypter  *ecncrypt = new Encrypter;
+  Encrypter  *encrypt = new Encrypter;
   QGridLayout *grid_layout = new QGridLayout;
   grid_layout->addWidget(label_id, 0, 0);
   grid_layout->addWidget(line_id, 1, 0);
@@ -70,14 +74,16 @@ FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
   grid_layout->addWidget(line_name, 3, 0);
   grid_layout->addWidget(label_password, 4, 0);
   grid_layout->addWidget(line_password, 5, 0);
-  grid_layout->addWidget(add_btn, 1, 1);
-  grid_layout->addWidget(hash_btn, 3, 1);
-  grid_layout->addWidget(unhash_btn, 5, 1);
+  grid_layout->addWidget(add_btn,6,0);
+  grid_layout->addWidget(decrypt_btn,6,1);
+  grid_layout->addWidget(encrypt_btn,7,0);
+  grid_layout->addWidget(generate_password,7,1);
 
   QGroupBox *group_box = new QGroupBox(this);
   group_box->setLayout(grid_layout);
 
   Database *db = new Database;
+  EncryptStorage *encrypt_db = new EncryptStorage;
 
   QObject::connect(add_btn, &QPushButton::clicked, db, [=]() {
     db->insertData(line_id->text(), line_name->text(), line_password->text());
@@ -86,30 +92,55 @@ FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
     line_password->clear();
   });
 
-  QObject::connect(hash_btn, &QPushButton::clicked, ecncrypt, [=]() {
+  QObject::connect(encrypt_btn, &QPushButton::clicked, encrypt, [=]() {
     const QString key = QInputDialog::getText(this, tr("Tab name "),
                                               tr("Enter key for enrcypt : "),
                                               QLineEdit::Normal);
     const QString data = db->getData(line_id->text());
-    ecncrypt->Encrypt(line_id->text(),data.toStdString(), key.toStdString());
+    encrypt->Encrypt(line_id->text(),data.toStdString(), key.toStdString());
     line_id->clear();
   });
 
-  QObject::connect(unhash_btn, &QPushButton::clicked, db, [=]() {
+  QObject::connect(decrypt_btn, &QPushButton::clicked, db, [=]() {
     const QString key =
         QInputDialog::getText(this, tr("Tab name "),
                               tr("Enter key for decrypt: "), QLineEdit::Normal);
-    EncryptStorage encrypt_db;
-    QString data = encrypt_db.getEncryptData(line_id->text());
+
+    QString data = encrypt_db->getEncryptData(line_id->text());
     std::string str = qPrintable(data);
-    const QString decrypt_data =  ecncrypt->Decrypt(line_id->text(),str, key.toStdString());
+    const QString decrypt_data =  encrypt->Decrypt(line_id->text(),str, key.toStdString());
     qDebug()<<decrypt_data;
     line_id->clear();
   });
+
+  QObject::connect(generate_password, &QPushButton::clicked, db, [=] {
+    int length =
+        QInputDialog::getInt(this, tr("Enter length for generate password"),
+                             tr("Length: "), QLineEdit::Normal);
+
+    QString pass = encrypt->GeneratePassword(length);
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Test", "Are you a new user?",
+                                  QMessageBox::Yes | QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+      db->updateData(line_id->text(), pass);
+
+    } else {
+      db->insertData(line_id->text(), "", pass);
+    }
+  });
+
+  QPalette pal = QPalette();
+  pal.setColor(QPalette::Window,Qt::gray);
+  this->setAutoFillBackground(true);
+  this->setPalette(pal);
 }
 
 FormPassword::~FormPassword() {
   delete line_password;
   delete line_name;
   delete line_id;
+
+
 }

@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "exception.h"
+#include "database.h"
 
 using namespace exception;
 
@@ -29,24 +30,39 @@ public:
         return Code::CORRECT;
     }
 
-    decltype(auto) isName(const QString &name){
-        if(name.isEmpty()){
+    decltype(auto) isName(const QString &name) {
+        if (name.isEmpty()) {
             err.error("Enter Incorrect name");
             return Code::WRONG_NAME;
+        }
+
+        for (int i = 0; i < name.size(); ++i) {
+            if (name[i].isDigit()) {
+                err.error("Name cannot contain digits");
+                return Code::NOT_VALID;
+            }
         }
 
         return Code::CORRECT;
     }
 
-    decltype(auto) isID(const QString& id){
-        if(id.isEmpty()){
+    decltype(auto) isID(const QString &id) {
+        if (id.isEmpty()) {
             err.error("Enter Incorrect ID");
             return Code::WRONG_ID;
+        }
+
+        for (int i = 0; i < id.size(); ++i) {
+            if (id[i].isLetter()) {
+                err.error("ID cannot contain letters");
+                return Code::NOT_VALID;
+            }
         }
         return Code::CORRECT;
     }
 
     Validator() = default;
+
     ~Validator() = default;
 
 private:

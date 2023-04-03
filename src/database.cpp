@@ -79,6 +79,29 @@ auto Database::deleteData(const QString &id_data) -> Code {
   return Code::SUCCESS;
 }
 
+auto Database::updateData(const QString &id, const QString &password) -> Code {
+  if (id.isEmpty() && password.isEmpty()) {
+    err.error("id or password is wrong", int(Code::NOT_VALID));
+  }
+
+  QSqlQuery query(db);
+
+  const QString updateSql =
+      "UPDATE ManagePassword SET password=:password WHERE id=:id";
+
+  if (query.prepare(updateSql)) {
+    query.bindValue(":id", id);
+    query.bindValue(":password", password);
+    query.exec();
+  } else {
+    err.error("Failed to update data", int(Code::BAD_REQUEST));
+      qDebug() << "SqLite error:" << query.lastError();
+
+  }
+
+  return Code::SUCCESS;
+}
+
 auto EncryptStorage::insertEncryptData(const QString &id, const QString &data)
     -> Code {
   if (id.isEmpty()) {
