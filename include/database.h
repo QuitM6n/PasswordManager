@@ -29,6 +29,8 @@ public:
 
   auto updateData(const QString &id_data, const QString &password) -> Code;
 
+  bool dbIsValid() const;
+
 protected:
     Exception err;
     QSqlDatabase db;

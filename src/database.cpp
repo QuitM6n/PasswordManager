@@ -102,6 +102,11 @@ auto Database::updateData(const QString &id, const QString &password) -> Code {
   return Code::SUCCESS;
 }
 
+bool Database::dbIsValid() const {
+  return db.tables().contains(QLatin1String("ManagePassword")),
+         db.tables().contains(QLatin1String("EncryptData"));
+}
+
 auto EncryptStorage::insertEncryptData(const QString &id, const QString &data)
     -> Code {
   if (id.isEmpty()) {
