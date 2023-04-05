@@ -37,9 +37,6 @@ public:
     explicit FormPassword(QWidget *parent = nullptr);
     ~FormPassword();
 
-public slots:
-
-
 private:
     QLineEdit *line_password;
     QLineEdit *line_name;
