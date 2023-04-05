@@ -124,10 +124,9 @@ FormPassword::FormPassword(QWidget *parent) : QWidget(parent) {
     reply = QMessageBox::question(this, "Test", "Are you a new user?",
                                   QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
-      db->updateData(line_id->text(), pass);
-
-    } else {
       db->insertData(line_id->text(), "", pass);
+    } else {
+      db->updateData(line_id->text(), pass);
     }
   });
 
